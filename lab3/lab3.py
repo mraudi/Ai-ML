@@ -1,5 +1,3 @@
-#LAB3 CANDIDATE ELIMINATION
-
 import csv
 
 with open("trainingexamples.csv") as f:
@@ -29,7 +27,7 @@ with open("trainingexamples.csv") as f:
         print(specific)
         print(general)
 
-    gh = [] # gh = general Hypothesis
+    gh = []
     for i in general:
         for j in i:
             if j != '?':
