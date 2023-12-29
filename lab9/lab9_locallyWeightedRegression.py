@@ -15,9 +15,9 @@ def draw(tau):
     plt.plot(domain, prediction, color='red')
     plt.show()
 
-X = np.linspace(-3, 3, num=1000)#evenly spaced numbers over [-3,3] totally num(1000) numbers
+X = np.linspace(-3, 3, num=1000)
 domain = X
-Y = np.log(np.abs((X ** 2) - 1) + .5)#just creating y values...chosing this to get W shaped curve
+Y = np.log(np.abs((X ** 2) - 1) + .5)
 
 draw(10)
 draw(0.1)
