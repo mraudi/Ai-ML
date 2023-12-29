@@ -1,99 +1,90 @@
-class Graph:
-    def __init__(self, graph, heuristicNodeList, startNode):  
-        
-        self.graph = graph
-        self.H=heuristicNodeList
-        self.start=startNode
-        self.parent={}
-        self.status={}
-        self.solutionGraph={}
+Graph_nodes = {
+    'A': [('B', 6), ('F', 3)],
+    'B': [('C', 3), ('D', 2)],
+    'C': [('D', 1), ('E', 5)],
+    'D': [('C', 1), ('E', 8)],
+    'E': [('I', 5), ('J', 5)],
+    'F': [('G', 1),('H', 7)] ,
+    'G': [('I', 3)],
+    'H': [('I', 2)],
+    'I': [('E', 5), ('J', 3)],
      
-    def applyAOStar(self):         
-        self.aoStar(self.start, False)
-
-    def getNeighbors(self, v):     
-        return self.graph.get(v,'')
-    
-    def getStatus(self,v):         
-        return self.status.get(v,0)  
-    
-    def setStatus(self,v, val):    
-        self.status[v]=val
-    
-    def getHeuristicNodeValue(self, n):
-        return self.H.get(n,0)     
- 
-    def setHeuristicNodeValue(self, n, value):
-        self.H[n]=value            
-       
-    def printSolution(self):
-        print("FOR GRAPH SOLUTION, TRAVERSE THE GRAPH FROM THE START NODE:",self.start)
-        print("------------------------------------------------------------")
-        print(self.solutionGraph)
-        print("------------------------------------------------------------")
-    
-    def computeMinimumCostChildNodes(self, v):  
-        minimumCost=0
-        costToChildNodeListDict={}
-        costToChildNodeListDict[minimumCost]=[]
-        flag=True
-        for nodeInfoTupleList in self.getNeighbors(v):  
-            cost=0
-            nodeList=[]
-            for c, weight in nodeInfoTupleList:
-                cost=cost+self.getHeuristicNodeValue(c)+weight
-                nodeList.append(c)
-            
-            if flag==True:                      
-                minimumCost=cost
-                costToChildNodeListDict[minimumCost]=nodeList      
-                flag=False
-            else:                               
-                if minimumCost>cost:
-                    minimumCost=cost
-                    costToChildNodeListDict[minimumCost]=nodeList  
-                
-              
-        return minimumCost, costToChildNodeListDict[minimumCost]   
-                     
-    def aoStar(self, v, backTracking):     
-        
-        print("HEURISTIC VALUES  :", self.H)
-        print("SOLUTION GRAPH    :", self.solutionGraph)
-        print("PROCESSING NODE   :", v)
-        print("-----------------------------------------------------------------------------------------")
-        
-        if self.getStatus(v) >= 0:        
-            minimumCost, childNodeList = self.computeMinimumCostChildNodes(v)
-            self.setHeuristicNodeValue(v, minimumCost)
-            self.setStatus(v,len(childNodeList)) 
-            
-            solved=True                   
-            for childNode in childNodeList:
-                self.parent[childNode]=v
-                if self.getStatus(childNode)!=-1:
-                    solved=solved & False
-            
-            if solved==True:             
-                self.setStatus(v,-1)     
-                self.solutionGraph[v]=childNodeList 
-            
-            
-            if v!=self.start:           
-                self.aoStar(self.parent[v], True)   
-                
-            if backTracking==False:     
-                for childNode in childNodeList:   
-                    self.setStatus(childNode,0)   
-                    self.aoStar(childNode, False) 
-                 
-h2 = {'A': 1, 'B': 6, 'C': 12, 'D': 10, 'E': 4, 'F': 4, 'G': 5, 'H': 7}  
-graph2 = {                                        
-    'A': [[('B', 1), ('C', 1)], [('D', 1)]],      
-    'B': [[('G', 1)], [('H', 1)]],                
-    'D': [[('E', 1), ('F', 1)]]                   
 }
 
-G2 = Graph(graph2, h2, 'A')                       
-G2.applyAOStar()                                  
-G2.printSolution()                                
+def get_neighbors(v):
+    if v in Graph_nodes:
+        return Graph_nodes[v]
+    else:
+        return None
+        
+def h(n):
+        H_dist = {
+            'A': 10,
+            'B': 8,
+            'C': 5,
+            'D': 7,
+            'E': 3,
+            'F': 6,
+            'G': 5,
+            'H': 3,
+            'I': 1,
+            'J': 0             
+        }
+        return H_dist[n]
+        
+def aStarAlgo(start_node, stop_node):
+         
+        open_set = set(start_node) 
+        closed_set = set()
+        g = {} 
+        parents = {}
+        g[start_node] = 0
+        parents[start_node] = start_node
+        
+        while len(open_set) > 0:
+            n = None
+
+            for v in open_set:
+                if n == None or g[v] + h(v) < g[n] + h(n):
+                    n = v
+     
+            if n == stop_node or Graph_nodes[n] == None:
+                pass
+            else:
+                for (m, weight) in get_neighbors(n):
+                    if m not in open_set and m not in closed_set:
+                        open_set.add(m)
+                        parents[m] = n
+                        g[m] = g[n] + weight
+                         
+                    else:
+                        if g[m] > g[n] + weight:
+                            g[m] = g[n] + weight
+                            parents[m] = n
+                            if m in closed_set:
+                                closed_set.remove(m)
+                                open_set.add(m)
+ 
+            if n == None:
+                print('Path does not exist!')
+                return None
+            if n == stop_node:
+                path = []
+ 
+                while parents[n] != n:
+                    path.append(n)
+                    n = parents[n]
+ 
+                path.append(start_node)
+ 
+                path.reverse()
+ 
+                print('Path found: {}'.format(path))
+                return path
+            open_set.remove(n)
+            closed_set.add(n)
+ 
+        print('Path does not exist!')
+        return None
+
+aStarAlgo('A', 'J')
