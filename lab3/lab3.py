@@ -1,37 +1,40 @@
 import csv
-
-with open("trainingexamples.csv") as f:
-    csv_file = csv.reader(f)
-    data = list(csv_file)
-
-    specific = data[0][:-1]
-    general = [['?' for i in range(len(specific))] for j in range(len(specific))]
-
-    step=1 #for printing purpose
-    for i in data:
-        if i[-1] == "Y":
-            for j in range(len(specific)):
-                if i[j] != specific[j]:
-                    specific[j] = "?"
-                    general[j][j] = "?"
-
-        elif i[-1] == "N":
-            for j in range(len(specific)):
-                if i[j] != specific[j]:
-                    general[j][j] = specific[j]
-                else:
-                    general[j][j] = "?"
-
-        print("\nStep {} of candidate elimination algo".format(step))
-        step+=1
-        print(specific)
-        print(general)
-
-    gh = []
-    for i in general:
-        for j in i:
-            if j != '?':
-                gh.append(i)
-                break
-    print("\nFinal Specific hypothesis:\n", specific)
-    print("\nFinal General hypothesis:\n", gh)
+a = []
+csvfile = open('trainingexamples.csv', 'r')
+reader = csv.reader(csvfile)
+print("Data present in csv file is: ")
+for row in reader:
+    a.append(row)
+    print(row)
+num_attributes = len(a[0]) - 1
+print("\nInitial hypothesis is ")
+s = ['0'] * num_attributes
+g = ['?'] * num_attributes
+print("The most specific: ", s)
+print("The most general: ", g)
+for j in range(0, num_attributes):
+    s[j] = a[0][j]
+print("\nThe Candidate Elimination Algorithm")
+temp = []
+for i in range(0, len(a)):
+    if (a[i][num_attributes] == 'Y'):
+        for j in range(0, num_attributes):
+            if (a[i][j] != s[j]):
+                s[j] = '?'
+        for j in range(0, num_attributes):
+            for k in range(1, len(temp)):
+                if temp[k][j] != '?' and temp[k][j] != s[j]:
+                    del temp[k]
+        print("\nfor instance {0} the space hypothesis is S{0}\n".format(i +1), s)
+        if (len(temp) == 0):
+            print("\nfor instance {0} the hypothesis is G{0}\n".format(i + 1),g)
+        else:
+            print("\nfor instance {0} the hypothesis is G{0}\n".format(i + 1),temp)
+    if (a[i][num_attributes] == 'N'):
+        for j in range(0, num_attributes):
+            if (s[j] != a[i][j] and s[j] != '?'):
+                g[j] = s[j]
+                temp.append(g)
+                g = ['?'] * num_attributes
+        print("\nFor instance{0} the hypothesis is s{0}\n".format(i + 1), s)
+        print("\nFor instance{0} the hypothesis is g{0}\n".format(i + 1),temp)
